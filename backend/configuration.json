@@ -1,0 +1,10 @@
+{
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "chunk_size": 100,
+  "chunk_overlap": 20,
+  "data_directory": "C:\\Divesh\\RAG LLM\\sample data",
+  "vector_db_directory": "C:\\Divesh\\RAG LLM\\vector_db",
+  "collections": [
+    "default_collection"
+  ]
+}
