@@ -1,0 +1,8 @@
+fastapi[all]==0.110.0  # Includes starlette for CORS
+uvicorn==0.29.0
+python-dotenv==1.0.1
+PyPDF2==3.0.1          # For PDF parsing
+openpyxl==3.1.2        # For Excel parsing
+python-docx==1.1.0     # For Word parsing
+chromadb==0.4.24       # Vector DB for RAG
+

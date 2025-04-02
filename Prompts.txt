@@ -1,0 +1,249 @@
+I want to build my own rag based llm. I want to use it to scan local code repositories, pdf files, excel/word files for technical /functional specifications and text files like csv for data insights.
+
+I don't want detail code at the moment. For now, i want from you 
+	- to understand my requirements as given below 
+	- tell me which of them make sense or which of them are not required or if there are some other requirements i can add
+	- once the requirements are set, i would like you t o provide a scaffolding of the project structure, and very high level code(just provide file name and 1-2 line summary of what it is doing).  
+	- The next step would be to create the basic scaffolding and then work on the backend and fronted of the first page so that they can be quickly tested either through front end or via postman and then we can move on to the 2nd, third and 4th page
+
+Requirements in no particular order - 
+
+1. Build Characters - 
+	- There should be minimum hard-coding. 
+	- I have a windows machine with docker, vs code and github account all of which I want to use.
+	- I want to build it with python and flask or based on the requirement what would you suggest. 
+	_ i should be able to use css to change the look and feel of the pages and it's elements specially the tables
+	- I want it to be very modular and api based.
+	- APIs should be secured initially with apikey and later I may want to upgrade it be oauth2 secured
+	- I want there to be swagger for the API layer with an option to provide the apikey and test the apis
+	- I want good enough details in the API swagger
+	- I want to docker the whole app. May be one docker for the back-end service and another docker for the front end. 
+	- I want to avoid hard coding and remember everything should be driven by the configuration
+	- There should be a toggle at top right corner to enable or disable logging. 
+	- I want different levels of logging at different points to make it easier to debug. Logging should be written to a log file and also i should be able to see them in the terminal.
+	- I want to have this code like a proper enterprise level code with facility to deploy the code to dev/tst/prod. What is the best way to do it. Can i have three docker layers, one for dev/test/prod each? 
+	- I want to implement ci/cd so that code from dev docker gets deployed to test docker and so on based on CI CD. You can provide your own input as to if this is advisable or is there a better way.
+	- Also want to have the pipeline doing ci/cd run unit tests before deploying. 
+	
+	
+	
+2. The front end should have 4 tabs. 
+	- 1st Page - Configuration Management - 
+		Requirements - 
+			- This page is for configuration like which embedding to use, chunk size, chunk overlap size, root directory for data folder which will be ingested, root directory for where the vector database is. 
+			- The whole app should be driven mainly by the configuration page as set in this page. e.g. User should be able to provide which embedding to use and everywhere in the app where embedding are to be used, the app should use the user provided value
+			- User should be able to use the modal window to point the folder where the files are.
+			- This page should also list all the collections from the vector db which can be multi-selected. Selected collections will be deleted based on user clicking a button. 
+
+	- 2nd page - Ingestion Factory - 
+		Requirements - 
+			- User should be able to use the modal window to point the folder where the files are. Files from the folder needs to be ingested. 
+			- User should be able to provide name to the collection for the ingested file
+			- The app needs to scan the folder, load all the files with extension that are set up in the configuration page.  Expected file types are all kinds of coding related files, pdfs, excel, word documents, csv files, text files.
+			- The app should chunk the data from the files. Please take care of different file types specially pdf, excel, word documents. 
+			- For vectorizing the data, i want to add directory path, file name, text snippet as metadata along with any other metadata you think would be useful. Remember the main idea is to be able to do rag based query for code repositories. 
+			- The chunk should be embedded with the embedding as configured in the config page. 
+			- If the file has already been processed before, the app should ignore the file but log it in the logger, but if the file is new or modified then the app needs to process it and log it in logger
+			- There should be a progress bar showing how many files of total files have been processed. It should also show how much mb out of total mb processed.
+			- Estimated Processing Time: Based on file sizes, give an estimated time for completion.
+			- Pause & Resume Processing: Allow users to pause and resume ingestion if they need to stop midway.
+			- Error Handling & Reporting: If a file fails to process, display a list of failed files with error messages and allow retrying them separately.
+			- Parallel Processing: If multiple files are being processed, use parallelism (e.g., multiprocessing or async tasks) to speed up ingestion.
+			- Preview File Data: Show a small preview of the extracted text before ingestion so users can verify correctness.
+			- Delete/Reprocess Options: If users want to reprocess a file, provide an option to override previously ingested data.
+			- Metadata Review: After scanning, show a summary of detected files with metadata before ingestion starts.
+	
+	- 3rd Page - Query Data - 
+		Requirements - 
+			- User should be able to provide a query
+			- User should be able to provide the value to top k results using a slider that goes from 1 - 20 in steps of 2 for  querying the vector database
+			- User should be able to provide the search type for querying the vector database. This should be a drop down. The list for drop down should come from the 1st page configuration
+			- User should be able to see list of collections from the vector database and should be able to select one or more collections to run the query on
+			- Once the user clicks on the search button, the code should list the results in a tabular format. The table should show Rank, Directory Path, File Name, Chunk Index, text Snippet, Score. 
+			- Is there a way to tell how close the result was to the search query in the result table. The values are exact, close, not close at all
+		
+	- 4th page - LLM Chat - 
+		Requirements - 
+			- I can interact with an llm using rag from the vector db here. For now, just create the scaffolding for this 
+
+--------------------------------------
+Finalised Requirements - 
+
+Use FastAPI instead of Flask for async support and Swagger.
+
+Single Docker image with environment variables for dev/test/prod.
+
+Configuration-driven app with JSON/YAML persistence.
+
+The frontend will be a single-page application (SPA) with 4 tabs, built using React or Angular.
+
+CSS customisation will be handled via component-specific styles or a library like Tailwind CSS (React) or Angular’s built-in styling.
+
+API integration will use fetch or axios (React) or Angular’s HttpClient.
+
+Docker will still work, but the frontend container will need Node.js to build and serve the app.
+
+
+
+
+
+
+---------------
+
+rag-llm-app/
++-- backend/
+¦   +-- Dockerfile              # Builds backend with FastAPI and dependencies
+¦   +-- requirements.txt        # Lists Python dependencies
+¦   +-- main.py                 # Entry point for FastAPI app
+¦   +-- config.py               # Loads and manages configuration
+¦   +-- logger.py               # Configures logging
+¦   +-- ingestion.py            # Handles file ingestion and vectorization
+¦   +-- query.py                # Queries vector DB
+¦   +-- chat.py                 # Placeholder for LLM chat
+¦   +-- models.py               # Data models for API
+¦   +-- utils.py                # Utility functions
+¦   +-- tests/                  # Unit tests
+¦       +-- test_ingestion.py   # Tests ingestion logic
+¦
++-- frontend/
+¦   +-- Dockerfile              # Builds React app with Node.js
+¦   +-- package.json            # Lists Node dependencies (e.g., react, axios)
+¦   +-- src/
+¦   ¦   +-- App.jsx             # Main app component with tab navigation
+¦   ¦   +-- components/
+¦   ¦   ¦   +-- ConfigTab.jsx   # Configuration management tab
+¦   ¦   ¦   +-- IngestionTab.jsx# Ingestion factory tab
+¦   ¦   ¦   +-- QueryTab.jsx    # Query data tab
+¦   ¦   ¦   +-- ChatTab.jsx     # LLM chat tab
+¦   ¦   ¦   +-- LoggerToggle.jsx# Toggle for enabling/disabling logging
+¦   ¦   +-- styles.css          # Global CSS (or use Tailwind)
+¦   ¦   +-- api.js              # API client for backend calls
+¦   +-- public/                 # Static assets (e.g., favicon)
+¦   +-- vite.config.js          # Vite config for fast builds (if using Vite)
+¦
++-- docker-compose.yml          # Orchestrates backend and frontend containers
++-- .github/workflows/          # CI/CD pipeline
+¦   +-- ci-cd.yml              # Runs tests and deploys
++-- README.md                   # Project overview
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+
+Prompt for - 02/04 - 
+
+Final Requirements (As Refined)
+Build Characteristics
+Minimum hard-coding, configuration-driven.
+
+Local dev on Windows with VS Code, GitHub; later Dockerized.
+
+Backend: Python + FastAPI (switched from Flask for async and Swagger).
+
+Frontend: React with CSS customization (using react-tabs for now).
+
+Modular, API-based with Swagger UI.
+
+API security: API key initially (from .env), OAuth2 later.
+
+Docker: One container for backend, one for frontend (to be implemented).
+
+Logging toggle and multi-level logging (not yet implemented).
+
+Enterprise-grade: Dev/Tst/Prod via env vars, CI/CD with unit tests (planned for Docker phase).
+
+Frontend Tabs
+Configuration Management:
+Form: Embedding, chunk size, chunk overlap, data/vector DB directories.
+
+Modal for folder selection (pending).
+
+List vector DB collections, multi-select, delete button.
+
+Drives app via config.
+
+Ingestion Factory: Scan/ingest files (code, PDFs, Excel, Word, CSV), chunking, vectorizing with metadata (pending).
+
+Query Data: Query vector DB with top-k slider, search type dropdown, results table (pending).
+
+LLM Chat: RAG-based LLM interaction (placeholder only).
+
+Current Progress (As of April 02, 2025)
+Backend:
+FastAPI at http://localhost:8000.
+
+.env with API_KEY=my-secret-key.
+
+/config GET returns config from config.json (default: embedding, chunk sizes, dirs, mock collections).
+
+/config POST saves config to config.json.
+
+CORS enabled for http://localhost:3000.
+
+Dependencies: fastapi[all], python-dotenv, etc., in requirements.txt.
+
+Frontend:
+React at http://localhost:3000.
+
+.env with REACT_APP_API_KEY=my-secret-key.
+
+Four tabs via react-tabs: Config (active), Ingestion/Query/Chat (placeholders).
+
+Config tab:
+Fetches config from backend.
+
+Form for editing embedding, chunk size, overlap, directories.
+
+Mock collections list with checkboxes and delete button.
+
+Save button sends config to backend.
+
+api.js handles GET/POST with API key.
+
+Project Structure:
+
+rag-llm-app/
++-- backend/
+¦   +-- .env                # API_KEY=my-secret-key
+¦   +-- main.py             # FastAPI with config endpoints
+¦   +-- config.json         # Generated config file
+¦   +-- requirements.txt
++-- frontend/
+¦   +-- .env                # REACT_APP_API_KEY=my-secret-key
+¦   +-- src/
+¦   ¦   +-- App.jsx         # Tabbed interface
+¦   ¦   +-- api.js          # API client
+¦   ¦   +-- components/
+¦   ¦   ¦   +-- ConfigTab.jsx  # Config UI
+¦   ¦   ¦   +-- IngestionTab.jsx
+¦   ¦   ¦   +-- QueryTab.jsx
+¦   ¦   ¦   +-- ChatTab.jsx
+
+Pending:
+Config tab: Modal for folder selection, real vector DB integration.
+
+Other tabs, logging, Docker, CI/CD.
+
+Prompt for Tomorrow
+Here’s what you can use to restart our session:
+
+Hi Grok, let’s continue building my RAG-based LLM app. Here’s where we left off on April 02, 2025:
+
+**Final Requirements:**
+- Build: Minimal hard-coding, Python/FastAPI backend, React frontend, API key security (later OAuth2), Docker (pending), logging toggle (pending), enterprise-grade with CI/CD (planned).
+- Tabs: 
+  1. Config Management: Form (embedding, chunk size, overlap, dirs), modal (pending), collections list/delete, config-driven.
+  2. Ingestion Factory: File ingestion (code, PDFs, Excel, Word, CSV), chunking, vectorizing (pending).
+  3. Query Data: Query vector DB, top-k slider, search type, results table (pending).
+  4. LLM Chat: RAG-based LLM (placeholder).
+
+**Progress:**
+- Backend: FastAPI at localhost:8000, .env API key, /config GET/POST with config.json, CORS for localhost:3000.
+- Frontend: React at localhost:3000, .env API key, 4 tabs, Config tab with form/collections/save working.
+- Pending: Config modal, vector DB, other tabs, Docker.
+
+Let’s pick up with testing/enhancing the Config tab or moving to the next step—your call!
+
+That should do it! Copy this into a file (e.g., rag-llm-progress.txt) or just paste it back to me tomorrow. Enjoy your break, and I’ll see you then!
+----------------------------------------------------------------------------
+
