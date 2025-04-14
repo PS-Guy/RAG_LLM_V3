@@ -123,8 +123,6 @@ function ConfigTab() {
                 sx={{ mt: 2 }}
               />
             </Grid>
-
-            {/* Data Directory Field */}
             <Grid item xs={12}>
               <TextField
                 label="Data Directory (Full Path or Select)"
@@ -134,30 +132,39 @@ function ConfigTab() {
                 variant="outlined"
                 size="small"
                 fullWidth
-                sx={{ mt: 2 }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton
-                      component="label"
-                      sx={{
-                        color: "#87CEEB",
-                        "&:hover": { color: "#4682B4" },
-                      }}
-                    >
-                      <FolderIcon />
-                      <input
-                        type="file"
-                        hidden
-                        webkitdirectory="true"
-                        onChange={(e) => handleFolderChange(e, "data_directory")}
-                      />
-                    </IconButton>
-                  ),
+                sx={{ mt: 2}}
+                slotProps={{
+                  input: {
+                    style: {
+                      whiteSpace: "nowrap",
+                      overflowX: "auto",
+                    },
+                    title: config.data_directory, // Tooltip on hover
+                  },
+                  endAdornment: {
+                    children: (
+                      <IconButton
+                        component="label"
+                        sx={{
+                          color: "#87CEEB",
+                          "&:hover": { color: "#4682B4" },
+                        }}
+                      >
+                        <FolderIcon />
+                        <input
+                          type="file"
+                          hidden
+                          webkitdirectory="true"
+                          onChange={(e) =>
+                            handleFolderChange(e, "data_directory")
+                          }
+                        />
+                      </IconButton>
+                    ),
+                  },
                 }}
               />
             </Grid>
-
-            {/* Vector DB Directory Field */}
             <Grid item xs={12}>
               <TextField
                 label="Vector DB Directory (Full Path or Select)"
@@ -168,26 +175,36 @@ function ConfigTab() {
                 size="small"
                 fullWidth
                 sx={{ mt: 2 }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton
-                      component="label"
-                      sx={{
-                        color: "#87CEEB",
-                        "&:hover": { color: "#4682B4" },
-                      }}
-                    >
-                      <FolderIcon />
-                      <input
-                        type="file"
-                        hidden
-                        webkitdirectory="true"
-                        onChange={(e) =>
-                          handleFolderChange(e, "vector_db_directory")
-                        }
-                      />
-                    </IconButton>
-                  ),
+                slotProps={{
+                  input: {
+                    style: {
+                      whiteSpace: "nowrap",
+                      overflowX: "auto",
+                      textOverflow: "ellipsis",
+                    },
+                    title: config.vector_db_directory, // Tooltip on hover
+                  },
+                  endAdornment: {
+                    children: (
+                      <IconButton
+                        component="label"
+                        sx={{
+                          color: "#87CEEB",
+                          "&:hover": { color: "#4682B4" },
+                        }}
+                      >
+                        <FolderIcon />
+                        <input
+                          type="file"
+                          hidden
+                          webkitdirectory="true"
+                          onChange={(e) =>
+                            handleFolderChange(e, "vector_db_directory")
+                          }
+                        />
+                      </IconButton>
+                    ),
+                  },
                 }}
               />
             </Grid>
