@@ -34,5 +34,15 @@ export const updateConfig = async (config) => {
   }
 };
 
+export const listDirectories = async () => {
+  try {
+    const response = await api.get("/list-dirs");
+    return response.data.directories;
+  } catch (error) {
+    console.error("Error listing directories:", error.message);
+    throw error;
+  }
+};
+
 // Export the api instance for custom requests if needed
 export default api;

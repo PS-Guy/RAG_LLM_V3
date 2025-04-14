@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 import json
+import concurrent.futures
 
 # Load .env file
 load_dotenv()
@@ -44,3 +45,32 @@ async def update_config(config: dict, api_key: str = Depends(get_api_key)):
     with open(CONFIG_FILE, "w") as f:
         json.dump(config, f, indent=2)
     return {"message": "Config updated successfully"}
+
+@app.get("/list-dirs")
+async def list_directories(api_key: str = Depends(get_api_key)):
+    # For Windows, list drives and allow drilling down
+    drives = "CDEFGHIJKLMNOPQRSTUVWXYZ"
+    existing_drives = []
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=26) as executor:
+        future_map = {executor.submit(check_drive, d): d for d in drives}
+        
+        for future, drive in future_map.items():
+            try:
+                result = future.result(timeout=0.5)  # ⏱️ per-task timeout here
+                if result:
+                    existing_drives.append(result)
+            except concurrent.futures.TimeoutError:
+                print(f"Timeout checking drive {drive}")
+            except Exception as e:
+                print(f"Error checking drive {drive}: {e}")
+
+    return {"directories": existing_drives}
+
+def check_drive(d):
+    path = f"{d}:\\"
+    try:
+        os.listdir(path)
+        return path
+    except Exception:
+        return None

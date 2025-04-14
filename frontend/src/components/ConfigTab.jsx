@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { fetchConfig, updateConfig } from "../api";
+import {
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  Box,
+  IconButton,
+} from "@mui/material";
+import FolderIcon from "@mui/icons-material/Folder";
+import SaveIcon from "@mui/icons-material/Save";
 
 function ConfigTab() {
   const [config, setConfig] = useState({
@@ -11,7 +21,6 @@ function ConfigTab() {
     collections: [],
   });
 
-  // Load config when component mounts
   useEffect(() => {
     const loadConfig = async () => {
       try {
@@ -24,16 +33,31 @@ function ConfigTab() {
     loadConfig();
   }, []);
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setConfig((prev) => ({
       ...prev,
-      [name]: name === "chunk_size" || name === "chunk_overlap" ? parseInt(value) : value,
+      [name]:
+        name === "chunk_size" || name === "chunk_overlap"
+          ? parseInt(value)
+          : value,
     }));
   };
 
-  // Handle form submission
+  const handleFolderChange = (e, field) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const relativePath = files[0].webkitRelativePath;
+      if (relativePath) {
+        const folderPath = relativePath.substring(0, relativePath.indexOf("/"));
+        setConfig((prevConfig) => ({
+          ...prevConfig,
+          [field]: folderPath,
+        }));
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -46,72 +70,143 @@ function ConfigTab() {
   };
 
   return (
-    <div>
-      <h2>Configuration Management</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Embedding Model:</label>
-          <input
-            type="text"
-            name="embedding_model"
-            value={config.embedding_model}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Chunk Size:</label>
-          <input
-            type="number"
-            name="chunk_size"
-            value={config.chunk_size}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Chunk Overlap:</label>
-          <input
-            type="number"
-            name="chunk_overlap"
-            value={config.chunk_overlap}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Data Directory:</label>
-          <input
-            type="text"
-            name="data_directory"
-            value={config.data_directory}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Vector DB Directory:</label>
-          <input
-            type="text"
-            name="vector_db_directory"
-            value={config.vector_db_directory}
-            onChange={handleChange}
-          />
-        </div>
-        {/* Collections could be a multi-select or text input for simplicity */}
-        <div>
-          <label>Collections (comma-separated):</label>
-          <input
-            type="text"
-            name="collections"
-            value={config.collections.join(",")}
-            onChange={(e) =>
-              setConfig((prev) => ({
-                ...prev,
-                collections: e.target.value.split(",").map((c) => c.trim()),
-              }))
-            }
-          />
-        </div>
-        <button type="submit">Save</button>
-      </form>
-    </div>
+    <Box
+      sx={{
+        padding: 4,
+        display: "flex",
+        justifyContent: "center",
+        height: "100vh",
+        alignItems: "center",
+      }}
+    >
+      <Box sx={{ maxWidth: 600, width: "100%", mt: 2 }}>
+        <Typography variant="h4" gutterBottom align="center">
+          Configuration Management
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={3} direction="column" alignItems="center">
+            <Grid item xs={12}>
+              <TextField
+                label="Embedding Model"
+                name="embedding_model"
+                value={config.embedding_model}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Chunk Size"
+                name="chunk_size"
+                type="number"
+                value={config.chunk_size}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Chunk Overlap"
+                name="chunk_overlap"
+                type="number"
+                value={config.chunk_overlap}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+              />
+            </Grid>
+
+            {/* Data Directory Field */}
+            <Grid item xs={12}>
+              <TextField
+                label="Data Directory (Full Path or Select)"
+                name="data_directory"
+                value={config.data_directory}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton
+                      component="label"
+                      sx={{
+                        color: "#87CEEB",
+                        "&:hover": { color: "#4682B4" },
+                      }}
+                    >
+                      <FolderIcon />
+                      <input
+                        type="file"
+                        hidden
+                        webkitdirectory="true"
+                        onChange={(e) => handleFolderChange(e, "data_directory")}
+                      />
+                    </IconButton>
+                  ),
+                }}
+              />
+            </Grid>
+
+            {/* Vector DB Directory Field */}
+            <Grid item xs={12}>
+              <TextField
+                label="Vector DB Directory (Full Path or Select)"
+                name="vector_db_directory"
+                value={config.vector_db_directory}
+                onChange={handleChange}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton
+                      component="label"
+                      sx={{
+                        color: "#87CEEB",
+                        "&:hover": { color: "#4682B4" },
+                      }}
+                    >
+                      <FolderIcon />
+                      <input
+                        type="file"
+                        hidden
+                        webkitdirectory="true"
+                        onChange={(e) =>
+                          handleFolderChange(e, "vector_db_directory")
+                        }
+                      />
+                    </IconButton>
+                  ),
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                startIcon={<SaveIcon />}
+                sx={{ mt: 2 }}
+              >
+                Save Configuration
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Box>
+    </Box>
   );
 }
 
